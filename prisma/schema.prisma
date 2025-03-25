@@ -14,8 +14,54 @@ datasource db {
 }
 
 model User {
-    id String @id @default(uuid())
-    username String @unique
-    password String
-    createdAt Datetime @default(now())
+  id              String           @id @default(uuid())
+  username        String           @unique
+  email           String           @unique
+  password        String
+  createdAt       DateTime         @default(now())
+  tasksCreated    Task[]           @relation("CreatedTasks")
+  taskAssignments TaskAssignment[]
+  comments        Comment[]
+}
+
+enum Status {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Task {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  status      Status    @default(PENDING)
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+  creatorId   String
+  creator     User      @relation("CreatedTasks", fields: [creatorId], references: [id])
+
+  assignments TaskAssignment[]
+  comments   Comment[]
+}
+
+model TaskAssignment {
+  taskId   String
+  userId   String
+  assignedAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@id([taskId, userId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  taskId    String
+  userId    String
+  comment   String
+  createdAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
