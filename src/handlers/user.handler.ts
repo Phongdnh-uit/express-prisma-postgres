@@ -25,6 +25,7 @@ export const signin = async (req, res) => {
         res.json({
             message: "Username or password is incorrect",
         });
+        return;
     }
 
     const isValid = await comparePasswords(req.body.password, user.password);
@@ -33,6 +34,7 @@ export const signin = async (req, res) => {
         res.json({
             message: "Username or password is incorrect",
         });
+        return;
     }
 
     const token = createJWT(user);
@@ -50,12 +52,6 @@ export const getAllUser = async (req, res) => {
 
 export const getUserById = async (req, res) => {
     const id = req.params.id;
-    if (!id) {
-        res.status(400);
-        res.json({
-            message: "id is missing",
-        });
-    }
     const user = await prisma.user.findUnique({
         where: {
             id,
@@ -66,6 +62,7 @@ export const getUserById = async (req, res) => {
         res.json({
             message: "user not found",
         });
+        return;
     }
 
     res.status(200);
